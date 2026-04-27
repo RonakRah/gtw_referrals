@@ -29,7 +29,8 @@ GROUP BY ALL
 ,bookings AS (
 	SELECT CAST(departure_place_id AS STRING) AS departure_place_id,
 	       CAST(arrival_place_id AS STRING) AS arrival_place_id ,
-				 COUNT(DISTINCT booking_uuid) AS number_of_booking
+				 COUNT(DISTINCT booking_uuid) AS number_of_booking,
+                 COUNT(DISTINCT CASE WHEN partner_id = 'google' THEN booking_uuid END ) AS booking_by_google
 	FROM 	centered-radius-89610.dwh_aggregate.enriched_bookings
 	WHERE transaction_ymd >= '2026-03-01'
 	GROUP BY ALL
@@ -131,6 +132,7 @@ SELECT tac_ref.Departure_Station,
        COALESCE(omio.num_of_TRIP_OPTION_CACHE_STALE,0) AS num_of_TRIP_OPTION_CACHE_STALE,
        COALESCE(omio.num_of_TICKETING_PROHIBITED,0) AS num_of_TICKETING_PROHIBITED,
 			 COALESCE(booking.number_of_booking,0) AS number_of_booking,
+       COALESCE(booking.booking_by_google,0) AS num_of_booking_by_google,
 
       ------ upriced link flag
       CASE
